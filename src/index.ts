@@ -3,6 +3,7 @@ import crypto from  "node:crypto"
 import { pedidosServicio } from "./utils/pedidos"
 
 import {  buscarPedido } from "./utils/BuscarUsuario"
+import { info } from "node:console";
 
 interface Pedido {
   id: `${string}-${string}-${string}-${string}-${string}`;
@@ -21,7 +22,12 @@ switch (accion) {
   
   case "info":
     console.log("-------COMANDOS VÁLIDOS-------")        
-    console.log("Ingrese 1 para -> ingresar Pedido seguido de -> 'nombre del cliente  direccion  fechaSolicitud (año - mes- dia)  tipoServicio  descripcion  tecnicoAsignado (Camila Rodríguez - Diego Herrera - Hugo López)  fechaProgramada (año - mes- dia)  estado (pendiente - completado - en proceso)  observaciones")
+    console.log("Ingrese 1 para -> ingresar Pedido seguido de -> ",
+      "nombre del cliente - ",
+      "direccion - ",
+      "tecnicoAsignado(Camila - Diego - Hugo) - " ,
+      " fechaProgramada(año - mes - dia) - ",
+      "estado(pendiente - completado - en proceso). ")
     console.log("Ingrese 2 para -> modificar Pedido  seguido de -> DNI del clinete")
     console.log("Ingrese 3 para -> eliminar Pedido   seguido de -> DNI del cliente")
     console.log("Ingrese 4 para -> ver Pedido xxxx-xx-xx seguido de -> fecha programada la visita (año-mes-dia) ")
@@ -35,28 +41,23 @@ switch (accion) {
     console.log(argumentos[3])
     if (argumentos[3]) {
       console.log("------NUEVO PEDIDO------")
-      console.log("Escriba 'nombre del cliente - DNI - direccion - tecnicoAsignado (Camila- Diego - Hugo) - fechaProgramada (año - mes- dia) - estado (pendiente - completado - en proceso) - ")
-       
-      const nombre = argumentos[3]
-      const dni = Number(argumentos[4])      
-      const direccionC = argumentos[5]
-      const tecnicoAsignadoC = argumentos[6]
-      const fechaVisita = argumentos[7]
-      const estadoC = argumentos[8]
+      console.log("Escriba 'nombre del cliente - DNI - direccion - tecnicoAsignado (Camila- Diego - Hugo) - fechaProgramada (año - mes- dia) - estado (pendiente - completado - en proceso) - ")       
+      const nombre = argumentos[4]
+      const dni = Number(argumentos[5])      
+      const direccionC = argumentos[6]
+      const tecnicoAsignadoC = argumentos[7]
+      const fechaVisita = argumentos[8]
+      const estadoC = argumentos[9]
       
       
       const nuevoPedido : Pedido = {
         id : crypto.randomUUID(),
         cliente : nombre,
-        dniCliente : dni,
-        telefonoCliente:telefono,
-        direccion : direccionC,
-        fechaSolicitud : fechaS,
-        tipoServicio : tipoS,
+        dniCliente : dni,       
+        direccion : direccionC,        
         tecnicoAsignado : tecnicoAsignadoC, 
         fechaProgramada : fechaVisita,
         estado : estadoC,
-        
       }
       // console.log(argumentos[4])
       const pedidoBuscado = buscarPedido(argumentos[4])
@@ -84,7 +85,7 @@ switch (accion) {
   case "3":
     console.log("------ELIMINAR PEDIDO------")
 
-    const DNI = argumentos[3]
+    const DNI = argumentos[5]
     if (!DNI) {
       console.log("Ingrese el DNI del cliente seguido de la opcion 3")
     } else {
@@ -155,7 +156,7 @@ switch (accion) {
       console.log("Ingrese DNI del cliente a buscar ")
     } else { 
       
-      const pedido = buscarPedido((argumentos[3]))
+      const pedido = buscarPedido((argumentos[5]))
     //   const clienteEspecifico = pedidosServicio.find((cliente) => cliente.dniCliente === Number(argumentos[3]))
       console.log(pedido)
     }
@@ -163,5 +164,5 @@ switch (accion) {
   case "8":
     console.log(pedidosServicio)
     break;
-  default: console.log("Comando invalido, ingrese info para ver todos los comandos")
-}
+  default: console.log("Comando invalido, ingrese 'info' para ver todos los comandos")
+} 
