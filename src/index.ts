@@ -28,7 +28,8 @@ switch (accion) {
       "tecnicoAsignado(Camila - Diego - Hugo) - " ,
       " fechaProgramada(año - mes - dia) - ",
       "estado(pendiente - completado - en proceso). ")
-    console.log("Ingrese 2 para -> modificar Pedido  seguido de -> DNI del clinete")
+    console.log("Ingrese 2 para -> modificar Pedido  seguido de -> DNI del cliente dato a modificar direccion tecnico fecha estado",
+      "si es un solo campo el que va a modificar, en el resto ingrese '-' ")
     console.log("Ingrese 3 para -> eliminar Pedido   seguido de -> DNI del cliente")
     console.log("Ingrese 4 para -> ver Pedido xxxx-xx-xx seguido de -> fecha programada la visita (año-mes-dia) ")
     console.log("Ingrese 5 para -> ver Pedidos Finalizados -> ver todos los pedidos con estado 'COMPLETADO'")
@@ -38,16 +39,15 @@ switch (accion) {
 
     break;
   case "1":
-    console.log(argumentos[3])
+    // console.log(argumentos[3])
     if (argumentos[3]) {
-      console.log("------NUEVO PEDIDO------")
-      console.log("Escriba 'nombre del cliente - DNI - direccion - tecnicoAsignado (Camila- Diego - Hugo) - fechaProgramada (año - mes- dia) - estado (pendiente - completado - en proceso) - ")       
-      const nombre = argumentos[4]
-      const dni = Number(argumentos[5])      
-      const direccionC = argumentos[6]
-      const tecnicoAsignadoC = argumentos[7]
-      const fechaVisita = argumentos[8]
-      const estadoC = argumentos[9]
+      console.log("------NUEVO PEDIDO------")            
+      const nombre = argumentos[3]
+      const dni = Number(argumentos[4])      
+      const direccionC = argumentos[5]
+      const tecnicoAsignadoC = argumentos[6]
+      const fechaVisita = argumentos[7]
+      const estadoC = argumentos[8]
       
       
       const nuevoPedido : Pedido = {
@@ -59,33 +59,54 @@ switch (accion) {
         fechaProgramada : fechaVisita,
         estado : estadoC,
       }
-      // console.log(argumentos[4])
-      const pedidoBuscado = buscarPedido(argumentos[4])
-      // console.log(pedidoBuscado,"----------------Pedido buscado fucnion")
-      if (!pedidoBuscado &&
-          !nombre ||
-          !dni ||          
-          !direccionC ||          
-          !tecnicoAsignadoC ||
-          !fechaVisita ||
-          !estadoC
-        ){
-        pedidosServicio.push(nuevoPedido)
-      } else { 
-        console.log("El usuario ya esta en la base de datos",pedidoBuscado)
-      }
+
+
+      if (nombre && dni && direccionC && tecnicoAsignadoC && fechaVisita && estadoC) {
+        const pedidoBuscado = buscarPedido(argumentos[4])
+        if (pedidoBuscado == undefined) {
+          pedidosServicio.push(nuevoPedido)
+          console.log("pedido agregado")
+        } else { 
+          console.log("El usuario ya esta en la base de datos", pedidoBuscado)
+        }
+      }else { 
+        console.log("Faltan datos")
+      }     
 
     } else {
       console.log("Ingrese los datos correspondientes ")
     }
     break;
   case "2":
-    console.log("------MODIFICAR PEDIDO------")
-    break;
+    console.log("------MODIFICAR PEDIDO ------")
+    
+    //Tomo los datos
+    const dni = Number(argumentos[3])      
+    const direccionC = argumentos[4]
+    const tecnicoAsignadoC = argumentos[5]
+    const fechaVisita = argumentos[6]
+    const estadoC = argumentos[7]
+    //busco el pedido a modificar
+    const pedidoAmodificar = buscarPedido(argumentos[3])
+
+   
+
+    if (pedidoAmodificar) {
+      if (direccionC !== "-") pedidoAmodificar.direccion = direccionC
+      if (tecnicoAsignadoC !== "-") pedidoAmodificar.tecnicoAsignado = tecnicoAsignadoC
+      if (fechaVisita !== "-") pedidoAmodificar.fechaProgramada = fechaVisita
+      if (estadoC !== "-") pedidoAmodificar.estado = estadoC
+      
+      pedidosServicio.push(pedidoAmodificar)
+      console.log("✅ Campos actualizados")
+      console.log(pedidoAmodificar)
+    }
+
+    break
   case "3":
     console.log("------ELIMINAR PEDIDO------")
 
-    const DNI = argumentos[5]
+    const DNI = argumentos[3]
     if (!DNI) {
       console.log("Ingrese el DNI del cliente seguido de la opcion 3")
     } else {
@@ -103,12 +124,12 @@ switch (accion) {
     }  
     break;
   case "4":
-    console.log("------VER VISITAS DEL PEDIDO A LA FECHA ", argumentos[7],"------")
-
+    console.log("------VER VISITAS DEL PEDIDO A LA FECHA ", argumentos[3],"------")
+    console.log(argumentos[3])
     if (!argumentos[3]) {
       console.log("Ingrese 'verPedido xxxx-xx-xx (año-mes-dia)', para poder visualizar el pedido a esa fecha")
     } else {
-      const pedidoEncontrado = pedidosServicio.find((pedido) => pedido.fechaProgramada === argumentos[7])
+      const pedidoEncontrado = pedidosServicio.find((pedido) => pedido.fechaProgramada === argumentos[3])
 
       console.log(pedidoEncontrado)
 
@@ -156,7 +177,7 @@ switch (accion) {
       console.log("Ingrese DNI del cliente a buscar ")
     } else { 
       
-      const pedido = buscarPedido((argumentos[5]))
+      const pedido = buscarPedido((argumentos[3]))
     //   const clienteEspecifico = pedidosServicio.find((cliente) => cliente.dniCliente === Number(argumentos[3]))
       console.log(pedido)
     }
