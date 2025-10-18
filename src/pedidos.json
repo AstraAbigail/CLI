@@ -1,0 +1,154 @@
+[
+  {
+    "cliente": "Lucia",
+    "dniCliente": 29856324,
+    "direccion": "Belgrano1245",
+    "tecnicoAsignado": "Camila",
+    "fechaProgramada": "2025-01-10",
+    "estado": "pendiente"
+  },
+  {
+    "cliente": "Carlos ",
+    "dniCliente": 30124567,
+    "direccion": "SanMartin582",
+    "tecnicoAsignado": "Hugo",
+    "fechaProgramada": "2025-01-22",
+    "estado": "completado"
+  },
+  {
+    "cliente": "Mariano ",
+    "dniCliente": 31245987,
+    "direccion": "Mitre890",
+    "tecnicoAsignado": "Daniel",
+    "fechaProgramada": "2025-02-03",
+    "estado": "pendiente"
+  },
+  {
+    "cliente": "Sofia",
+    "dniCliente": 28456321,
+    "direccion": "Rivadavia456",
+    "tecnicoAsignado": "Camila",
+    "fechaProgramada": "2025-02-15",
+    "estado": "completado"
+  },
+  {
+    "cliente": "Javier",
+    "dniCliente": 30567890,
+    "direccion": "Italia345",
+    "tecnicoAsignado": "Hugo",
+    "fechaProgramada": "2025-03-01",
+    "estado": "pendiente"
+  },
+  {
+    "cliente": "Marta",
+    "dniCliente": 27345892,
+    "direccion": "Sarmiento219",
+    "tecnicoAsignado": "Daniel",
+    "fechaProgramada": "2025-03-10",
+    "estado": "completado"
+  },
+  {
+    "cliente": "Federico",
+    "dniCliente": 32987456,
+    "direccion": "Urquiza1002",
+    "tecnicoAsignado": "Camila",
+    "fechaProgramada": "2025-03-25",
+    "estado": "pendiente"
+  },
+  {
+    "cliente": "Valentina",
+    "dniCliente": 31856247,
+    "direccion": "Lavalle789",
+    "tecnicoAsignado": "Hugo",
+    "fechaProgramada": "2025-04-06",
+    "estado": "completado"
+  },
+  {
+    "cliente": "Tomas",
+    "dniCliente": 29654821,
+    "direccion": "Alem1020",
+    "tecnicoAsignado": "Daniel",
+    "fechaProgramada": "2025-04-18",
+    "estado": "pendiente"
+  },
+  {
+    "cliente": "Laura",
+    "dniCliente": 28765432,
+    "direccion": "Saavedra635",
+    "tecnicoAsignado": "Camila",
+    "fechaProgramada": "2025-04-30",
+    "estado": "completado"
+  },
+  {
+    "cliente": "Diego",
+    "dniCliente": 33456289,
+    "direccion": "Independencia320",
+    "tecnicoAsignado": "Hugo",
+    "fechaProgramada": "2025-05-12",
+    "estado": "pendiente"
+  },
+  {
+    "cliente": "Camila",
+    "dniCliente": 32564781,
+    "direccion": "Dorrego740",
+    "tecnicoAsignado": "Daniel",
+    "fechaProgramada": "2025-05-25",
+    "estado": "completado"
+  },
+  {
+    "cliente": "Juan",
+    "dniCliente": 30987546,
+    "direccion": "Belgrano910",
+    "tecnicoAsignado": "Camila",
+    "fechaProgramada": "2025-06-05",
+    "estado": "pendiente"
+  },
+  {
+    "cliente": "Agustina",
+    "dniCliente": 30123654,
+    "direccion": "España204",
+    "tecnicoAsignado": "Hugo",
+    "fechaProgramada": "2025-06-15",
+    "estado": "completado"
+  },
+  {
+    "cliente": "Nicolas",
+    "dniCliente": 29365478,
+    "direccion": "Alvear375",
+    "tecnicoAsignado": "Daniel",
+    "fechaProgramada": "2025-07-01",
+    "estado": "pendiente"
+  },
+  {
+    "cliente": "Martina",
+    "dniCliente": 31125689,
+    "direccion": "Catamarca980",
+    "tecnicoAsignado": "Camila",
+    "fechaProgramada": "2025-07-20",
+    "estado": "completado"
+  },
+  {
+    "cliente": "Pablo",
+    "dniCliente": 32874561,
+    "direccion": "Moreno1220",
+    "tecnicoAsignado": "Hugo",
+    "fechaProgramada": "2025-08-02",
+    "estado": "pendiente"
+  },
+  {
+    "cliente": "Brenda",
+    "dniCliente": 29987412,
+    "direccion": "Tucuman451",
+    "tecnicoAsignado": "Daniel",
+    "fechaProgramada": "2025-08-18",
+    "estado": "completado"
+  },
+  {
+    "cliente": "Lucas",
+    "dniCliente": 31546897,
+    "direccion": "Chile730",
+    "tecnicoAsignado": "Camila",
+    "fechaProgramada": "2025-09-05",
+    "estado": "pendiente"
+  }
+]

@@ -1,8 +1,7 @@
 
-import { pedidosServicio} from "./pedidos"
+// import { pedidosServicio} from "./pedidos"
 
-interface Pedido {
-  id: `${string}-${string}-${string}-${string}-${string}`;
+interface Pedido { 
   cliente: string;
   dniCliente: number,  
   direccion: string;  
@@ -11,10 +10,10 @@ interface Pedido {
   estado: string;
 }
 
-const buscarPedido = (argumentos: String): Pedido | undefined => { 
-  console.log(argumentos,"--------argumentos")
+const buscarPedido = (argumentos: String, pedidos:any []): Pedido | undefined => { 
+  // console.log(argumentos,"--------argumentos")
 
-  const clienteEspecifico = pedidosServicio.find((pedido) => pedido.dniCliente === Number(argumentos));
+  const clienteEspecifico = pedidos.find((pedido) => pedido.dniCliente === Number(argumentos));
   // console.log(clienteEspecifico,"cliente especifico")
   return clienteEspecifico;
 
