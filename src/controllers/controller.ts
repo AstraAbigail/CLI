@@ -1,12 +1,12 @@
 
-import moongose from "mongoose"
+import moongose, { Schema, Document} from "mongoose"
 
 import { writeDb } from "../db/connection";
 
 import {  buscarPedido } from "../utils/BuscarUsuario"
 import { info } from "node:console";
 
-interface Pedido {
+interface IPedido {
   // id: `${string}-${string}-${string}-${string}-${string}`;
   cliente: string;
   dniCliente: number,  
@@ -16,20 +16,32 @@ interface Pedido {
   estado: string;
 }
 
-const URI_BD = "mongodb://localhost:27017"
+const PedidoSchema = new Schema<IPedido>({
+  cliente: { type: String, required: true },
+  dniCliente:{ type: Number, required: true }, 
+  direccion:{ type: String, required: true },  
+  tecnicoAsignado:{ type: String, required: true },
+  fechaProgramada:{ type: String, required: true },
+  estado: { type: String, required: true }
+})
+
+const MPedido = moongose.model<IPedido>("Pedido", PedidoSchema)
+
+const URI_BD = "mongodb://localhost:27017/db_utn"
 
 const connect_BD = async (URI: string)=> {
   try {
     await moongose.connect(URI)
     console.log("Conectado a la base de datos ✅")
-  } catch (e) {
-    console.log("Error al conectarse a la BD ❌")
+  } catch (error) {
+    const e = error as Error //fuerza que se trate como error
+    console.log("Error al conectarse a la BD ❌",e.name)
     
   }
 }
 
 
-const main = (argumentos: any[], accion: string, pedidos: any[]) => {
+const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
   connect_BD(URI_BD)
   switch (accion) {
     
@@ -63,7 +75,7 @@ const main = (argumentos: any[], accion: string, pedidos: any[]) => {
         const estadoC = argumentos[8]
         
         
-        const nuevoPedido: Pedido = {
+        const nuevoPedido: IPedido = {
           // id : crypto.randomUUID(),
           cliente: nombre,
           dniCliente: dni,
@@ -154,7 +166,7 @@ const main = (argumentos: any[], accion: string, pedidos: any[]) => {
     case "5":
       console.log("------PEDIDOS FINALIZADOS------")
           
-      let pedidosFinalizados: Pedido[] = []
+      let pedidosFinalizados: IPedido[] = []
 
       pedidos.forEach((pedido) => {
         if (pedido.estado === "completado") {
@@ -171,7 +183,7 @@ const main = (argumentos: any[], accion: string, pedidos: any[]) => {
     case "6":
       console.log("------PEDIDOS PENDIENTES------")
 
-      let pedidosPendientes: Pedido[] = []
+      let pedidosPendientes: IPedido[] = []
 
       pedidos.forEach((pedido) => {
         if (pedido.estado === "pendiente") {
@@ -198,7 +210,9 @@ const main = (argumentos: any[], accion: string, pedidos: any[]) => {
       }
       break;
     case "8":
-      console.log(pedidos)
+      // console.log(pedidos)
+      const pedidosTodos = await MPedido.find({})
+      console.log(pedidosTodos)
       break;
     default: console.log("Comando invalido, ingrese 'info' para ver todos los comandos")
   }
