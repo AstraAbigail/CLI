@@ -16,8 +16,21 @@ interface Pedido {
   estado: string;
 }
 
-const main = (argumentos: any[], accion: string, pedidos: any[]) => {
+const URI_BD = "mongodb://localhost:27017"
 
+const connect_BD = async (URI: string)=> {
+  try {
+    await moongose.connect(URI)
+    console.log("Conectado a la base de datos ✅")
+  } catch (e) {
+    console.log("Error al conectarse a la BD ❌")
+    
+  }
+}
+
+
+const main = (argumentos: any[], accion: string, pedidos: any[]) => {
+  connect_BD(URI_BD)
   switch (accion) {
     
     case "info":
