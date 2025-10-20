@@ -68,37 +68,54 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
       if (argumentos[3]) {
         console.log("------NUEVO PEDIDO------")
         const nombre = argumentos[3]
-        const dni = Number(argumentos[4])
+        const dni = argumentos[4]
         const direccionC = argumentos[5]
         const tecnicoAsignadoC = argumentos[6]
         const fechaVisita = argumentos[7]
         const estadoC = argumentos[8]
         
         
-        const nuevoPedido: IPedido = {
-          // id : crypto.randomUUID(),
-          cliente: nombre,
-          dniCliente: dni,
-          direccion: direccionC,
-          tecnicoAsignado: tecnicoAsignadoC,
-          fechaProgramada: fechaVisita,
-          estado: estadoC,
+        // const nuevoPedido: IPedido = {
+        //   // id : crypto.randomUUID(),
+        //   cliente: nombre,
+        //   dniCliente: dni,
+        //   direccion: direccionC,
+        //   tecnicoAsignado: tecnicoAsignadoC,
+        //   fechaProgramada: fechaVisita,
+        //   estado: estadoC,
+        // }
+
+        const existePedido = await MPedido.findOne({ dni: dni })
+        
+        if (!existePedido) {
+          //agrego
+          const nuevoPedido = new MPedido({
+            cliente: nombre.toLowerCase(),
+            dniCliente: Number(dni),
+            direccion: direccionC.toLowerCase(),
+            tecnicoAsignado: tecnicoAsignadoC.toLowerCase(),
+            fechaProgramada: fechaVisita,
+            estado:estadoC.toLowerCase()            
+          })
+          await nuevoPedido.save()
+          console.log(nuevoPedido,"<-Pedido Agregado")
+        } else { 
+          console.log(existePedido,": Pedido ya existente")
         }
 
-
-        if (nombre && dni && direccionC && tecnicoAsignadoC && fechaVisita && estadoC) {
-          const pedidoBuscado = buscarPedido(argumentos[4],pedidos)
-          if (pedidoBuscado == undefined) {
-            pedidos.push(nuevoPedido)
-            writeDb(pedidos)           
-            console.log("pedido agregado")
-            console.log(pedidos)
-          } else {
-            console.log("El usuario ya esta en la base de datos", pedidoBuscado)
-          }
-        } else {
-          console.log("Faltan datos")
-        }
+        // if (nombre && dni && direccionC && tecnicoAsignadoC && fechaVisita && estadoC) {
+        //   const pedidoBuscado = buscarPedido(argumentos[4],pedidos)
+        //   if (pedidoBuscado == undefined) {
+        //     pedidos.push(nuevoPedido)
+        //     writeDb(pedidos)           
+        //     console.log("pedido agregado")
+        //     console.log(pedidos)
+        //   } else {
+        //     console.log("El usuario ya esta en la base de datos", pedidoBuscado)
+        //   }
+        // } else {
+        //   console.log("Faltan datos")
+        // }
 
       } else {
         console.log("Ingrese los datos correspondientes ")
@@ -113,19 +130,26 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
       const tecnicoAsignadoC = argumentos[5]
       const fechaVisita = argumentos[6]
       const estadoC = argumentos[7]
-      //busco el pedido a modificar
-      const pedidoAmodificar = buscarPedido(argumentos[3], pedidos)
-      // console.log(pedidoAmodificar,"---------------------------")    
 
-      if (pedidoAmodificar) {
-        if (direccionC !== "-") pedidoAmodificar.direccion = direccionC
-        if (tecnicoAsignadoC !== "-") pedidoAmodificar.tecnicoAsignado = tecnicoAsignadoC
-        if (fechaVisita !== "-") pedidoAmodificar.fechaProgramada = fechaVisita
-        if (estadoC !== "-") pedidoAmodificar.estado = estadoC
-        writeDb(pedidos)        
-        console.log("✅ Campos actualizados")
-        console.log(pedidos)
-      }
+      //filtro-actualizacion-opciones
+      const pedidoModificado = await MPedido.findOneAndUpdate({ dniCliente: dni },
+        {
+          direccion: direccionC.toLowerCase(),
+          tecnicoAsignado: tecnicoAsignadoC.toLowerCase(),
+          fechaProgramada: fechaVisita,
+          estado:estadoC.toLowerCase()
+        },
+        {
+          new:true
+        }
+      
+      )
+
+      console.log(pedidoModificado || "No se actualizo")
+
+     
+        
+      
       break
     case "3":
       console.log("------ELIMINAR PEDIDO------")
@@ -135,18 +159,27 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
         console.log("Ingrese el DNI del cliente seguido de la opcion 3")
       } else {
 
-        const indice = pedidos.findIndex((pedido) => pedido.dniCliente === Number(DNI))
-
-        if (indice === -1) {
-          console.log("El pedido no existe")
-        } else {
-          console.log("---PEDIDO BORRADO---")
-          const pedidoBorrado = pedidos.splice(indice, 1)
-          // console.log(pedidoBorrado, "<- pedido borrado")
+        const pedidoBorrado = await MPedido.findOneAndDelete({ dniCliente: String(DNI) })
+        
+        if (!pedidoBorrado) {
+          console.log("No se encuentra el usuario a borrar")
+        } else { 
+          console.log("Usuario borrado con exito")
           
-          writeDb(pedidos)  
-          console.log(pedidos,"PEDIDOS ACTUALIZADOS")
         }
+
+        // const indice = pedidos.findIndex((pedido) => pedido.dniCliente === Number(DNI))
+
+        // if (indice === -1) {
+        //   console.log("El pedido no existe")
+        // } else {
+        //   console.log("---PEDIDO BORRADO---")
+        //   const pedidoBorrado = pedidos.splice(indice, 1)
+        //   // console.log(pedidoBorrado, "<- pedido borrado")
+          
+        //   writeDb(pedidos)  
+         
+        
         
       }
       break;
@@ -156,9 +189,17 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
       if (!argumentos[3]) {
         console.log("Ingrese 'verPedido xxxx-xx-xx (año-mes-dia)', para poder visualizar el pedido a esa fecha")
       } else {
-        const pedidoEncontrado = pedidos.find((pedido) => pedido.fechaProgramada === argumentos[3])
+        
+        // const pedidoEncontrado = pedidos.find((pedido) => pedido.fechaProgramada === argumentos[3])
 
-        console.log(pedidoEncontrado)
+        const pedidoEncontrado = await MPedido.find({fechaProgramada: argumentos[3]})
+
+        
+        if (!pedidoEncontrado) {
+          console.log("No se encuentra en la BD")
+        } else { 
+          console.log(pedidoEncontrado)
+        }
 
       }
       break;
@@ -166,14 +207,15 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
     case "5":
       console.log("------PEDIDOS FINALIZADOS------")
           
-      let pedidosFinalizados: IPedido[] = []
+      // let pedidosFinalizados: IPedido[] = []
+      
+      // pedidos.forEach((pedido) => {
+      //   if (pedido.estado === "completado") {
+      //     pedidosFinalizados.push(pedido)
+      //   }
+      // })
 
-      pedidos.forEach((pedido) => {
-        if (pedido.estado === "completado") {
-          pedidosFinalizados.push(pedido)
-        }
-      })
-
+      const pedidosFinalizados = await MPedido.find({estado: "completado"})
       if (pedidosFinalizados.length === 0) {
         console.log("No hay pedidos finalizados aún")
       } else {
@@ -183,16 +225,16 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
     case "6":
       console.log("------PEDIDOS PENDIENTES------")
 
-      let pedidosPendientes: IPedido[] = []
-
-      pedidos.forEach((pedido) => {
-        if (pedido.estado === "pendiente") {
-          pedidosPendientes.push(pedido)
-        }
-      })
+      // let pedidosPendientes: IPedido[] = []
+      // pedidos.forEach((pedido) => {
+      //   if (pedido.estado === "pendiente") {
+      //     pedidosPendientes.push(pedido)
+      //   }
+      // })
+      const pedidosPendientes = await MPedido.find({estado: "pendiente"})
 
       if (pedidosPendientes.length === 0) {
-        console.log("No hay pedidos finalizados aún")
+        console.log("No hay pedidos pendientes aún")
       } else {
         console.log(pedidosPendientes)
       }
@@ -204,9 +246,14 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
         console.log("Ingrese DNI del cliente a buscar ")
       } else {
         
-        const pedido = buscarPedido(argumentos[3],pedidos)
-        //   const clienteEspecifico = pedidosServicio.find((cliente) => cliente.dniCliente === Number(argumentos[3]))
-        console.log(pedido)
+        // const pedido = buscarPedido(argumentos[3],pedidos)
+        const clienteEspecifico = await MPedido.find({dniCliente: String(argumentos[3])})
+
+        if (!clienteEspecifico) { 
+          console.log("Cliente no encontrado")
+        } else {
+          console.log(clienteEspecifico)  
+        }
       }
       break;
     case "8":
@@ -216,5 +263,7 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
       break;
     default: console.log("Comando invalido, ingrese 'info' para ver todos los comandos")
   }
+  process.exit(1)
 }
+
 export { main }
