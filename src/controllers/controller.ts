@@ -64,7 +64,7 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
 
       break;
     case "1":
-      // console.log(argumentos[3])
+      
       if (argumentos[3]) {
         console.log("------NUEVO PEDIDO------")
         const nombre = argumentos[3]
@@ -101,21 +101,7 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
           console.log(nuevoPedido,"<-Pedido Agregado")
         } else { 
           console.log(existePedido,": Pedido ya existente")
-        }
-
-        // if (nombre && dni && direccionC && tecnicoAsignadoC && fechaVisita && estadoC) {
-        //   const pedidoBuscado = buscarPedido(argumentos[4],pedidos)
-        //   if (pedidoBuscado == undefined) {
-        //     pedidos.push(nuevoPedido)
-        //     writeDb(pedidos)           
-        //     console.log("pedido agregado")
-        //     console.log(pedidos)
-        //   } else {
-        //     console.log("El usuario ya esta en la base de datos", pedidoBuscado)
-        //   }
-        // } else {
-        //   console.log("Faltan datos")
-        // }
+        }        
 
       } else {
         console.log("Ingrese los datos correspondientes ")
@@ -144,11 +130,7 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
         }
       
       )
-
-      console.log(pedidoModificado || "No se actualizo")
-
-     
-        
+      console.log(pedidoModificado || "No se actualizo")       
       
       break
     case "3":
@@ -166,20 +148,7 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
         } else { 
           console.log("Usuario borrado con exito")
           
-        }
-
-        // const indice = pedidos.findIndex((pedido) => pedido.dniCliente === Number(DNI))
-
-        // if (indice === -1) {
-        //   console.log("El pedido no existe")
-        // } else {
-        //   console.log("---PEDIDO BORRADO---")
-        //   const pedidoBorrado = pedidos.splice(indice, 1)
-        //   // console.log(pedidoBorrado, "<- pedido borrado")
-          
-        //   writeDb(pedidos)  
-         
-        
+        }       
         
       }
       break;
@@ -188,9 +157,7 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
       console.log(argumentos[3])
       if (!argumentos[3]) {
         console.log("Ingrese 'verPedido xxxx-xx-xx (año-mes-dia)', para poder visualizar el pedido a esa fecha")
-      } else {
-        
-        // const pedidoEncontrado = pedidos.find((pedido) => pedido.fechaProgramada === argumentos[3])
+      } else {     
 
         const pedidoEncontrado = await MPedido.find({fechaProgramada: argumentos[3]})
 
@@ -205,15 +172,8 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
       break;
       
     case "5":
-      console.log("------PEDIDOS FINALIZADOS------")
-          
-      // let pedidosFinalizados: IPedido[] = []
-      
-      // pedidos.forEach((pedido) => {
-      //   if (pedido.estado === "completado") {
-      //     pedidosFinalizados.push(pedido)
-      //   }
-      // })
+      console.log("------PEDIDOS FINALIZADOS------")      
+     
 
       const pedidosFinalizados = await MPedido.find({estado: "completado"})
       if (pedidosFinalizados.length === 0) {
@@ -224,13 +184,7 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
       break;
     case "6":
       console.log("------PEDIDOS PENDIENTES------")
-
-      // let pedidosPendientes: IPedido[] = []
-      // pedidos.forEach((pedido) => {
-      //   if (pedido.estado === "pendiente") {
-      //     pedidosPendientes.push(pedido)
-      //   }
-      // })
+     
       const pedidosPendientes = await MPedido.find({estado: "pendiente"})
 
       if (pedidosPendientes.length === 0) {
@@ -244,9 +198,8 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
       console.log("------BUSCAR PEDIDO------")
       if (!argumentos[3]) {
         console.log("Ingrese DNI del cliente a buscar ")
-      } else {
-        
-        // const pedido = buscarPedido(argumentos[3],pedidos)
+      } else {      
+      
         const clienteEspecifico = await MPedido.find({dniCliente: String(argumentos[3])})
 
         if (!clienteEspecifico) { 
@@ -256,8 +209,7 @@ const main = async (argumentos: any[], accion: string, pedidos: any[]) => {
         }
       }
       break;
-    case "8":
-      // console.log(pedidos)
+    case "8":     
       const pedidosTodos = await MPedido.find({})
       console.log(pedidosTodos)
       break;
