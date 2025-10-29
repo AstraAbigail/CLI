@@ -1,18 +1,42 @@
-import express, {Request,Response } from "express"
+import express, {ErrorRequestHandler, Request,Response } from "express"
 import cors from "cors"
 import fs from "node:fs"
 
-import moongose, { Schema, Document, Types} from "mongoose"
+import moongose, { Schema, Document, Types, Model, model} from "mongoose"
+import e from "express"
+
+import bcrypt from "bcryptjs"
+
+import jwt from "jsonwebtoken"
 
 const PORT = 3000
 /*coneccion a la base de datos en mongoDB*/
 const URI_BD = "mongodb://localhost:27017/db_utn"
+const SECRET_KEY = "clavesecretaId"
 
 // const pedidos = JSON.stringify(fs.readFileSync("../pedidos.json","utf-8"))
 
 const app = express()
 app.use(cors())
 app.use(express.json())
+
+//interfaz para acceso de usuarios
+interface IUser { 
+  email: string,
+  password: string
+}
+//versionKey, agrega un dato __v:0,sirve para ver cuantas veces se modifico un documento a mano. con False se lo sacamos.
+const userSchema = new Schema<IUser>({
+  email: { type: String, required: true, unique: true },
+  password:{type:String, requere:true}
+}, {
+  versionKey:false
+})
+
+const userModel: Model<IUser> = model("User",userSchema)
+
+
+
 
 
 interface IPedido {
@@ -23,7 +47,6 @@ interface IPedido {
   fechaProgramada: string;
   estado: string;
 }
-
 const PedidoSchema = new Schema<IPedido>({
   cliente: { type: String, required: true },
   dniCliente:{ type: Number, required: true }, 
@@ -32,7 +55,6 @@ const PedidoSchema = new Schema<IPedido>({
   fechaProgramada:{ type: String, required: true },
   estado: { type: String, required: true }
 })
-
 const MPedido = moongose.model<IPedido>("Pedido", PedidoSchema)
 
 const connect_BD = async (URI: string)=> {
@@ -45,6 +67,70 @@ const connect_BD = async (URI: string)=> {
     process.exit(1)
   }
 }
+
+//autentificacion
+app.post("/auth/register", async (req: Request, res: Response): Promise<void | Response> => { 
+
+  try {
+    const { body } = req
+    const { email, password } = body
+    
+    if (!email || !password) { 
+      return res.status(404).json("datos invalidos")
+    }
+    
+
+    //obtener HASH y darselo de valora a la contraseña
+    const hash = await bcrypt.hash(password,10)
+
+    const newUser = new userModel({ email, password:hash })
+    
+    await newUser.save()
+    res.json(newUser)
+
+  } catch (e) {
+    const error = e as Error
+    switch (error.name) { 
+      case "MongoServerError":
+        return res.status(409).json({ message: "Usuario ya existente"})
+    }
+   
+  }
+   
+  
+})
+
+app.post("/auth/login", async (req:Request, res:Response): Promise<Response | void> => {
+  try {
+    const { email, password } = req.body
+    console.log(email, password)
+    if (!email || !password) {
+      return res.status(401).json({ error: "Faltan datos" })
+    }
+
+    const user = await userModel.findOne({ email })
+
+    if (!user) {
+      return res.status(401).json({ error: "No Autorizado" })
+    }
+    console.log(user.password)
+    const isValid = await bcrypt.compare(password, user.password)
+    console.log(isValid)
+    if (!isValid) {
+      return res.status(401).json({ error: "No Autorizado" })
+    }
+    //permiso especial -> sesion de uso
+   
+
+    const token = jwt.sign({id: user._id}, SECRET_KEY, {expiresIn:"1h"})
+    res.json({token})
+
+  } catch (e) {
+    const error = e as Error
+    res.status(500).json({ error: error.message })
+  } 
+  
+})
 
 
 //Estado de la conexion
@@ -81,10 +167,10 @@ app.get("/pedidos/:id", async(request: Request, response: Response):Promise<Resp
 // })
 
 //Mostrar todos los pedidos
-// app.get("/pedidos", async (request: Request, response: Response): Promise< Response | void> => { 
-//   const pedidosBuscado = await MPedido.find()
-//   response.status(200).json({pedidosBuscado})  
-// })
+app.get("/pedidos", async (request: Request, response: Response): Promise< Response | void> => { 
+  const pedidosBuscado = await MPedido.find()
+  response.status(200).json({pedidosBuscado})  
+})
 
 
 //eliminar pedido
@@ -162,7 +248,8 @@ app.patch("/pedidos/:id", async (req: Request, res: Response): Promise<void | Re
 
 })
 
-app.use("", (req: Request, res: Response) => {
+//para cualquier ruta -> esa es la respuesta no es necesario poner ("") como primer parametro
+app.use( (req: Request, res: Response) => {
   res.status(404).json({error:"El recuerso no se encuentra"})
 })
 
