@@ -41,7 +41,8 @@ const connect_BD = async (URI: string)=> {
     console.log("Conectado a la base de datos ✅")
   } catch (error) {
     const e = error as Error //fuerza que se trate como error
-    console.log("Error al conectarse a la BD ❌",e.name)    
+    console.log("Error al conectarse a la BD ❌", e.name)   
+    process.exit(1)
   }
 }
 
@@ -63,7 +64,7 @@ app.get("/pedidos/:id", async(request: Request, response: Response):Promise<Resp
     }
     response.status(200).json({ pedidoBuscado })
   } catch (error) {
-    response.status(400).json({error: "Error al obtener pedido"})  
+    response.status(500).json({error: "Error del servidor"})  
   }        
 })
 
@@ -96,8 +97,8 @@ app.delete("/pedidos/:id", async (req: Request, res: Response): Promise<void | R
     }
 
     const pedido = await MPedido.findByIdAndDelete(id)
-
     res.json(pedido)
+
   } catch (e) {
     const error = e as Error
     res.status(500).json({ error: error.message })
@@ -105,27 +106,32 @@ app.delete("/pedidos/:id", async (req: Request, res: Response): Promise<void | R
 })
 
 //agregar pedido
-app.post("/pedidos", async (req: Request, res: Response): Promise <void | Response> => { 
-  const { body } = req
+app.post("/pedidos", async (req: Request, res: Response): Promise<void | Response> => { 
+  try {
+    const { body } = req
 
-  const { cliente, dniCliente, direccion, tecnicoAsignado, fechaProgramada, estado } = body
-  
-  if (!cliente || !dniCliente || !direccion || !tecnicoAsignado || !fechaProgramada || !estado) { 
-    return res.status(400).json({ menssage:"Datos invalidos" })
+    const { cliente, dniCliente, direccion, tecnicoAsignado, fechaProgramada, estado } = body
+    
+    if (!cliente || !dniCliente || !direccion || !tecnicoAsignado || !fechaProgramada || !estado) { 
+      return res.status(400).json({ menssage:"Datos invalidos" })
+    }
+
+    const nuevoPedido = new MPedido({
+      cliente,
+      dniCliente,
+      direccion,
+      tecnicoAsignado,
+      fechaProgramada,
+      estado
+    })
+    await nuevoPedido.save()
+    //mando datos y se agregan
+    res.status(201).json(nuevoPedido)
+
+  } catch (error) {
+    res.status(500).json({ error:"Error interno del servidor"})
   }
-
-  const nuevoPedido = new MPedido({
-    cliente,
-    dniCliente,
-    direccion,
-    tecnicoAsignado,
-    fechaProgramada,
-    estado
-  })
-  await nuevoPedido.save()
-  //mando datos y se agregan
-  res.status(201).json(nuevoPedido)
-
+  
 })
 
 //MODIFICAR PEDIDO
@@ -134,10 +140,15 @@ app.patch("/pedidos/:id", async (req: Request, res: Response): Promise<void | Re
     const { id } = req.params
     const {body} = req
 
+    //return implicito
+    if (!Types.ObjectId.isValid(id)) res.status(400).json({ error: "ID Inválido" })
+    
+
     const { cliente, dniCliente, direccion, tecnicoAsignado, fechaProgramada, estado } = body
 
+    //objeto con las actualizaciones
     const updates = { cliente, dniCliente, direccion, tecnicoAsignado, fechaProgramada, estado }
-    
+    //new:true, devuelve el objeto actualizado
     const pedido = await MPedido.findByIdAndUpdate(id, updates, { new: true })
     
     if (!pedido) {
@@ -150,6 +161,11 @@ app.patch("/pedidos/:id", async (req: Request, res: Response): Promise<void | Re
   }
 
 })
+
+app.use("", (req: Request, res: Response) => {
+  res.status(404).json({error:"El recuerso no se encuentra"})
+})
+
 
 //endpoint para comunicar el estado interno de la API
 app.listen(PORT, () => { 
