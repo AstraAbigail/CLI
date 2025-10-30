@@ -93,9 +93,9 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   try {
     //verificar token si es asi, se decodifica
-    const logginUser = jwt.verify(token, SECRET_KEY)
+    const logginUser = jwt.verify(token, SECRET_KEY);
      
-    
+    (res as any).IUser = logginUser
     
     next()
   } catch (e) {
@@ -192,17 +192,6 @@ app.get("/pedidos/:id",authMiddleware, async(request: Request, response: Respons
   }        
 })
 
-//PEDIDOS SEGUN ESTADO -uso body, porque va a venir de algun filtro, select desde la UI
-// app.get("/pedidos", async (req: Request, res: Response):Promise<Response | void >=> { 
-//   const estado = req.body
-//   console.log(estado)
-//   const pedidosPendientes = await MPedido.find({ estado })
-//   console.log(pedidosPendientes)
-//   if (!pedidosPendientes) { 
-//     return res.status(404).json({message:"No hay pedidos con estado pendiente"})
-//   }   
-//   res.status(200).json({pedidosPendientes})       
-// })
 
 //Mostrar todos los pedidos
 app.get("/pedidos", authMiddleware, async (req: Request, res: Response): Promise<Response | void> => { 
