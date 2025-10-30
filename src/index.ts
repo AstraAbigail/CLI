@@ -1,4 +1,4 @@
-import express, {ErrorRequestHandler, Request,Response } from "express"
+import express, {ErrorRequestHandler, NextFunction, Request,Response } from "express"
 import cors from "cors"
 import fs from "node:fs"
 
@@ -7,12 +7,24 @@ import e from "express"
 
 import bcrypt from "bcryptjs"
 
-import jwt from "jsonwebtoken"
+import jwt, { decode } from "jsonwebtoken"
+
+//comunica a todo el proyecto que si la request tiene una prop user, la acepte
+declare global {
+  namespace Express { 
+    interface Request { 
+      user?:any
+    }
+  }
+ }
+
 
 const PORT = 3000
 /*coneccion a la base de datos en mongoDB*/
 const URI_BD = "mongodb://localhost:27017/db_utn"
 const SECRET_KEY = "clavesecretaId"
+
+
 
 // const pedidos = JSON.stringify(fs.readFileSync("../pedidos.json","utf-8"))
 
@@ -67,6 +79,32 @@ const connect_BD = async (URI: string)=> {
     process.exit(1)
   }
 }
+
+//Midderware
+const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const header = req.headers.authorization
+
+  if (!header) {
+    return res.status(401).json({ error: "Token requerido" })
+  }
+  const token = header?.split(" ")[1]
+
+  console.log(token)
+
+  try {
+    //verificar token si es asi, se decodifica
+    const logginUser = jwt.verify(token, SECRET_KEY)
+     
+    
+    
+    next()
+  } catch (e) {
+    const error = e as Error
+    res.status(401).json({ error: error.message })
+  }
+}
+
+
 
 //autentificacion
 app.post("/auth/register", async (req: Request, res: Response): Promise<void | Response> => { 
@@ -139,7 +177,7 @@ app.get("/", (request: Request, response: Response) => {
 })
 
 //Buscar Pedido por ID
-app.get("/pedidos/:id", async(request: Request, response: Response):Promise<Response | void> => { 
+app.get("/pedidos/:id",authMiddleware, async(request: Request, response: Response):Promise<Response | void> => { 
   try {
     const id = request.params.id
         
@@ -167,14 +205,22 @@ app.get("/pedidos/:id", async(request: Request, response: Response):Promise<Resp
 // })
 
 //Mostrar todos los pedidos
-app.get("/pedidos", async (request: Request, response: Response): Promise< Response | void> => { 
-  const pedidosBuscado = await MPedido.find()
-  response.status(200).json({pedidosBuscado})  
+app.get("/pedidos", authMiddleware, async (req: Request, res: Response): Promise<Response | void> => { 
+  try {
+    
+    const pedidosBuscado = await MPedido.find()
+    res.status(200).json(pedidosBuscado)  
+    
+  } catch (e) {
+    const error = e as Error
+    res.status(500).json("Error")
+  }
+  
 })
 
 
 //eliminar pedido
-app.delete("/pedidos/:id", async (req: Request, res: Response): Promise<void | Response> => {
+app.delete("/pedidos/:id", authMiddleware,async (req: Request, res: Response): Promise<void | Response> => {
   try {
     const { id } = req.params
 
@@ -192,7 +238,7 @@ app.delete("/pedidos/:id", async (req: Request, res: Response): Promise<void | R
 })
 
 //agregar pedido
-app.post("/pedidos", async (req: Request, res: Response): Promise<void | Response> => { 
+app.post("/pedidos",authMiddleware, async (req: Request, res: Response): Promise<void | Response> => { 
   try {
     const { body } = req
 
@@ -221,7 +267,7 @@ app.post("/pedidos", async (req: Request, res: Response): Promise<void | Respons
 })
 
 //MODIFICAR PEDIDO
-app.patch("/pedidos/:id", async (req: Request, res: Response): Promise<void | Response> => { 
+app.patch("/pedidos/:id", authMiddleware,async (req: Request, res: Response): Promise<void | Response> => { 
   try {
     const { id } = req.params
     const {body} = req
