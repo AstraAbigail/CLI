@@ -22,7 +22,7 @@ pedidoRouter.get("/:id",authMiddleware, PedidosControlers.getPedidoByID)
 pedidoRouter.post("/",authMiddleware, PedidosControlers.addPedido)
 
 //MODIFICAR PEDIDO
-pedidoRouter.patch("/:id", authMiddleware, PedidosControlers.patchPedido)
+pedidoRouter.patch("/:id", authMiddleware, PedidosControlers.updatePedido)
 
 //eliminar pedido
 pedidoRouter.delete("/:id", authMiddleware, PedidosControlers.deletePedido)

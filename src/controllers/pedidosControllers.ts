@@ -4,27 +4,27 @@ import {Response, Request  } from "express"
 
 
 const getAllPedidos = async (__: Request, res: Response): Promise<Response | void> => {
-  try {    
+  try {
     const pedidosBuscado = await MPedido.find()
-    res.status(200).json(pedidosBuscado)    
+    res.status(200).json({success: true, data: pedidosBuscado })
   } catch (e) {
     const error = e as Error
-    res.status(500).json("Error")
+    res.status(500).json({success: false, error: error.message })
   }
 }
 
- const getPedidoByID = async(request: Request, response: Response):Promise<Response | void> => { 
+const getPedidoByID = async(request: Request, response: Response):Promise<Response | void> => { 
   try {
-    const id = request.params.id
-        
+    const id = request.params.id        
     const pedidoBuscado = await MPedido.findById(id)
 
     if (!Types.ObjectId.isValid(id)) {
-      return response.status(400).json({ message: "ID invalido" })
+      return response.status(400).json({success:false , error: "ID invalido" })
     }
-    response.status(200).json({ pedidoBuscado })
-  } catch (error) {
-    response.status(500).json({error: "Error del servidor"})  
+    response.status(200).json({ success:true, data:pedidoBuscado })
+  } catch (e) {
+    const error = e as Error
+    response.status(500).json({success:false, error: error.message})  
   }        
 }
 
@@ -32,11 +32,10 @@ const getAllPedidos = async (__: Request, res: Response): Promise<Response | voi
 const addPedido = async (req: Request, res: Response): Promise<void | Response> => { 
   try {
     const { body } = req
-
     const { cliente, dniCliente, direccion, tecnicoAsignado, fechaProgramada, estado } = body
     
     if (!cliente || !dniCliente || !direccion || !tecnicoAsignado || !fechaProgramada || !estado) { 
-      return res.status(400).json({ menssage:"Datos invalidos" })
+      return res.status(400).json({success:false, error:"Datos invalidos" })
     }
 
     const nuevoPedido = new MPedido({
@@ -49,16 +48,16 @@ const addPedido = async (req: Request, res: Response): Promise<void | Response> 
     })
     await nuevoPedido.save()
     //mando datos y se agregan
-    res.status(201).json(nuevoPedido)
+    res.status(201).json({success:true, data: nuevoPedido })
 
   } catch (error) {
-    res.status(500).json({ error:"Error interno del servidor"})
+    res.status(500).json({success:false, error:"Error interno del servidor"})
   }
   
 }
 
 
-const patchPedido = async (req: Request, res: Response): Promise<void | Response> => { 
+const updatePedido = async (req: Request, res: Response): Promise<void | Response> => { 
   try {
     const { id } = req.params
     const {body} = req
@@ -91,17 +90,17 @@ const deletePedido = async (req: Request, res: Response): Promise<void | Respons
     const { id } = req.params
 
     if (!Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "ID Inválido" });
+      return res.status(400).json({success:false, error: "ID Inválido" });
     }
 
     const pedido = await MPedido.findByIdAndDelete(id)
-    res.json(pedido)
+    res.json({success:true,data:pedido})
 
   } catch (e) {
     const error = e as Error
-    res.status(500).json({ error: error.message })
+    res.status(500).json({success:false, error: error.message })
   }
 }
 
 
-export default { getAllPedidos, getPedidoByID, addPedido, patchPedido, deletePedido }
+export default { getAllPedidos, getPedidoByID, addPedido, updatePedido, deletePedido }
