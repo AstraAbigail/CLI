@@ -23,7 +23,7 @@ app.use(express.json())
 
 //usos
 app.use("/pedidos", pedidoRouter)
-app.use("/auth/", authRouter)
+app.use("/auth", authRouter)
 
 //.use para cualquier ruta -> esa es la respuesta no es necesario poner ("") como primer parametro
 app.use( (__: Request, res: Response) => {
