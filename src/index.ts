@@ -3,6 +3,11 @@ import cors from "cors"
 import connectBD from "./config/mongodb"
 import pedidoRouter from "./routes/pedidosRouter"
 import authRouter from "./routes/authRouter"
+import morgan from "morgan"
+
+import authMiddleware from "./middleware/authMiddleware"
+import limiter from "./middleware/rateLimitMiddleware"
+
 
 
 
@@ -20,10 +25,12 @@ const PORT = 3000
 const app = express()
 app.use(cors())
 app.use(express.json())
+app.use(morgan("dev"))
+app.use(limiter)
 
-//usos
+app.use("/auth", limiter, authRouter)
 app.use("/pedidos", pedidoRouter)
-app.use("/auth", authRouter)
+
 
 //.use para cualquier ruta -> esa es la respuesta no es necesario poner ("") como primer parametro
 app.use( (__: Request, res: Response) => {
