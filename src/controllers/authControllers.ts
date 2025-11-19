@@ -3,6 +3,10 @@ import userModel from "../model/UserModel"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 
+import dotenv from "dotenv"
+dotenv.config()
+
+const SECRET_KEY = String(process.env.JWT_SECRET);
 
 class AuthController { 
 
@@ -32,11 +36,12 @@ class AuthController {
       }   
     }    
   }
+
   static login = async (req: Request, res: Response): Promise<Response | void> => {
-    const SECRET_KEY = "clavesecretaId"
+    
     try {
       const { email, password } = req.body
-      console.log(email, password)
+      
       if (!email || !password) {
         return res.status(401).json({success:false, error: "Faltan datos" })
       }
@@ -46,16 +51,15 @@ class AuthController {
       if (!user) {
         return res.status(401).json({success:false, error: "No Autorizado" })
       }
-      console.log(user.password)
+      
       const isValid = await bcrypt.compare(password, user.password)
-      console.log(isValid)
+      
       if (!isValid) {
         return res.status(401).json({success:false, error: "No Autorizado" })
       }
-      //permiso especial -> sesion de uso
-    
+      //permiso especial -> sesion de uso    
 
-      const token = jwt.sign({id: user._id}, SECRET_KEY, {expiresIn:"1h"})
+      const token = jwt.sign({ id: user._id },SECRET_KEY,{ expiresIn: "1h" });
       res.json({success:true, data:token})
 
     } catch (e) {

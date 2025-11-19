@@ -1,10 +1,22 @@
+
 {
   "compilerOptions": {
-    "target": "ES2019",
-    "module": "commonjs",
-    "rootDir": "src",
-    "outDir": "dist",
-    "esModuleInterop": true,
-    "strict": true
-  }
+    "target": "ES2020", // Moderno y compatible con Node 16+
+    "module": "commonjs", // Ideal para proyectos con Express
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "esModuleInterop": true, // Permite importar módulos CommonJS fácilmente
+    "forceConsistentCasingInFileNames": true, // Evita errores en sistemas case-sensitive
+    "strict": true, // Activa las validaciones más importantes
+    "skipLibCheck": true, // Evita errores en definiciones de tipos externas
+    "noImplicitAny": true, // No permite variables sin tipo
+    "noUnusedLocals": true, // Detecta variables locales sin usar
+    "resolveJsonModule": true // Permite importar archivos .json
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -1,11 +1,13 @@
 import { connect } from "mongoose"
-
+import dotenv from "dotenv"
+dotenv.config()
 
 
 const connectBD = async ():Promise<void> => {
-  const URI_BD = "mongodb://localhost:27017/db_utn"
+  const URI_DB =process.env.URI_DB!
+  console.log("uri_db:",URI_DB)
   try {
-    await connect(URI_BD)
+    await connect(URI_DB)
     console.log("Conectado a la base de datos ✅")
   } catch (error) {
     const e = error as Error //fuerza que se trate como error

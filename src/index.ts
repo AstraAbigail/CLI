@@ -4,23 +4,24 @@ import connectBD from "./config/mongodb"
 import pedidoRouter from "./routes/pedidosRouter"
 import authRouter from "./routes/authRouter"
 import morgan from "morgan"
-
-import authMiddleware from "./middleware/authMiddleware"
+// import authMiddleware from "./middleware/authMiddleware"
 import limiter from "./middleware/rateLimitMiddleware"
-
-
+import IUserTokenPayload from "./interfaces/IUserTokenPayload"
+import dotenv from "dotenv"
+dotenv.config()
 
 
 //comunica a todo el proyecto que si la request tiene una prop user, la acepte
 declare global {
   namespace Express { 
     interface Request { 
-      user?:any
+      user?:IUserTokenPayload
     }
   }
  }
 
-const PORT = 3000
+const PORT = process.env.PORT
+console.log(PORT)
 
 const app = express()
 app.use(cors())

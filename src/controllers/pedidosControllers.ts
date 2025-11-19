@@ -1,6 +1,7 @@
 import { Types } from "mongoose"
 import MPedido from "../model/PedidoModel"
-import {Response, Request  } from "express"
+import { Response, Request } from "express"
+import { createPedidosSchema, updatePedidosSchema } from "../validators/pedidosValidate"
 
 class PedidosController { 
   
@@ -36,8 +37,17 @@ class PedidosController {
       const { cliente, dniCliente, direccion, tecnicoAsignado, fechaProgramada, estado } = body
       
       if (!cliente || !dniCliente || !direccion || !tecnicoAsignado || !fechaProgramada || !estado) { 
-        return res.status(400).json({success:false, error:"Datos invalidos" })
+        return res.status(400).json({success:false, error:"Todos los datos son requeridos" })
       }
+
+      const validator = createPedidosSchema.safeParse(body)
+
+      if (!validator.success) {
+        return res.status(400).json({
+          success: false, error: validator.error.flatten.name
+        })     
+      }
+      
 
       const nuevoPedido = new MPedido({
         cliente,
@@ -71,13 +81,18 @@ class PedidosController {
 
       //objeto con las actualizaciones
       const updates = { cliente, dniCliente, direccion, tecnicoAsignado, fechaProgramada, estado }
-      //new:true, devuelve el objeto actualizado
-      const pedido = await MPedido.findByIdAndUpdate(id, updates, { new: true })
       
+      const validator = updatePedidosSchema.safeParse(updates)
+    
+
+        //new:true, devuelve el objeto actualizado
+      const pedido = await MPedido.findByIdAndUpdate(id, validator.data, { new: true })      
       if (!pedido) {
         return res.status(404).json({ error: "Producto no encontrado" })
       }
       res.json(pedido)
+
+      
     } catch (e) { 
       const error = e as Error
       res.status(500).json({ error: error.message })

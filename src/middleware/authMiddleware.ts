@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from "express"
 import jwt from "jsonwebtoken"
+import IUserTokenPayload from "../interfaces/IUserTokenPayload"
+import dotenv from "dotenv"
+dotenv.config()
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const SECRET_KEY = "clavesecretaId"
-  
+  const SECRET_KEY = process.env.JWT_SECRET!
   const header = req.headers.authorization
 
   if (!header) {
@@ -11,13 +13,13 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   }
   const token = header?.split(" ")[1]
 
-  console.log(token)
+  
 
   try {
     //verificar token si es asi, se decodifica
-    const logginUser = jwt.verify(token, SECRET_KEY);
+    const payload = jwt.verify(token, SECRET_KEY);
      
-    (res as any).IUser = logginUser
+    req.user = payload as IUserTokenPayload
     
     next()
   } catch (e) {
