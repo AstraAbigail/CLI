@@ -1,5 +1,5 @@
 import { Router} from "express"
-import authMiddleware from "../middleware/authMiddleware"
+// import authMiddleware from "../middleware/authMiddleware"
 import PedidosControlers from "../controllers/pedidosControllers"
 
 
@@ -11,21 +11,21 @@ const pedidoRouter = Router()
 //   res.json({status:true})
 // })
 
-
+//se desactivo addmiderware 
 //Mostrar todos los pedidos
-pedidoRouter.get("/", authMiddleware, PedidosControlers.getAllPedidos)
+pedidoRouter.get("/", PedidosControlers.getAllPedidos)
 
 //Buscar Pedido por ID
-pedidoRouter.get("/:id",authMiddleware, PedidosControlers.getPedidoByID)
+pedidoRouter.get("/:id", PedidosControlers.getPedidoByID)
 
 //agregar pedido
-pedidoRouter.post("/",authMiddleware, PedidosControlers.addPedido)
+pedidoRouter.post("/", PedidosControlers.addPedido)
 
 //MODIFICAR PEDIDO
-pedidoRouter.patch("/:id", authMiddleware, PedidosControlers.updatePedido)
+pedidoRouter.patch("/:id",  PedidosControlers.updatePedido)
 
 //eliminar pedido
-pedidoRouter.delete("/:id", authMiddleware, PedidosControlers.deletePedido)
+pedidoRouter.delete("/:id",  PedidosControlers.deletePedido)
 
 
 export default pedidoRouter
