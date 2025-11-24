@@ -32,7 +32,8 @@ app.use(limiter)
 app.get("/", (__: Request, res: Response) => { 
   res.json({status:true})
 })
-app.use("/auth", limiter, authRouter)
+//limiter
+app.use("/auth",limiter, authRouter)
 app.use("/pedidos", pedidoRouter)
 
 

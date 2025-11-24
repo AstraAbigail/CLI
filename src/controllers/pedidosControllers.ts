@@ -35,28 +35,23 @@ class PedidosController {
     try {
       const { body } = req
       const { cliente, dniCliente, direccion, tecnicoAsignado, fechaProgramada, estado } = body
+
+      console.log(body)
       
       if (!cliente || !dniCliente || !direccion || !tecnicoAsignado || !fechaProgramada || !estado) { 
         return res.status(400).json({success:false, error:"Todos los datos son requeridos" })
       }
-
+     
       const validator = createPedidosSchema.safeParse(body)
-
+      console.log(validator)
       if (!validator.success) {
         return res.status(400).json({
-          success: false, error: validator.error.flatten.name
+          success: false,  error: validator.error.message
         })     
       }
       
 
-      const nuevoPedido = new MPedido({
-        cliente,
-        dniCliente,
-        direccion,
-        tecnicoAsignado,
-        fechaProgramada,
-        estado
-      })
+      const nuevoPedido = new MPedido(validator.data)
       await nuevoPedido.save()
       //mando datos y se agregan
       res.status(201).json({success:true, data: nuevoPedido })

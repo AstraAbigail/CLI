@@ -6,12 +6,12 @@ import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
 dotenv.config()
 
-const SECRET_KEY = String(process.env.JWT_SECRET);
+
 
 class AuthController { 
-
+  
   static register = async (req: Request, res: Response): Promise<void | Response> => { 
-
+    
     try {
       const { body } = req
       const { email, password } = body
@@ -38,7 +38,8 @@ class AuthController {
   }
 
   static login = async (req: Request, res: Response): Promise<Response | void> => {
-    
+    const SECRET_KEY = String(process.env.JWT_SECRET);
+
     try {
       const { email, password } = req.body
       
