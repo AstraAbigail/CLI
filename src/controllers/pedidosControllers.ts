@@ -5,9 +5,23 @@ import { createPedidosSchema, updatePedidosSchema } from "../validators/pedidosV
 
 class PedidosController { 
   
-  static getAllPedidos = async (__: Request, res: Response): Promise<Response | void> => {
+  static getAllPedidos = async (req: Request, res: Response): Promise<Response | void> => {
     try {
-      const pedidosBuscado = await MPedido.find()
+
+      const {cliente, dniCliente, tecnicoAsignado, fechaDesde, fechaHasta, estado}= req.query
+      const filter: any = {}
+
+      if (cliente) filter.cliente = new RegExp(String(cliente), "i")
+      if (dniCliente) filter.dniCliente = Number(dniCliente)
+      if (tecnicoAsignado) filter.tecnicoAsignado = new RegExp(String(tecnicoAsignado), "i")
+      if (fechaDesde || fechaHasta) {
+        filter.fechaProgramada = {}
+        if (fechaDesde) filter.fechaProgramada.$gte = fechaDesde
+        if (fechaHasta) filter.fechaProgramada.$lte = fechaHasta
+      }
+
+      
+      const pedidosBuscado = await MPedido.find(filter)
       res.status(200).json({success: true, data: pedidosBuscado })
     } catch (e) {
       const error = e as Error
