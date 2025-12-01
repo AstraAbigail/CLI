@@ -20,13 +20,19 @@ class AuthController {
         return res.status(404).json({success:false, error:"datos invalidos"})
       }    
 
+      const pedidoExistente = await userModel.findOne({ email })
+      
+      if (pedidoExistente) { 
+        return res.status(409).json({success:false,error:"Usuario ya existente"})
+      }
+
       //obtener HASH y darselo de valora a la contraseña
       const hash = await bcrypt.hash(password,10)
 
       const newUser = new userModel({ email, password:hash })
       
       await newUser.save()
-      res.json({ success:true,data:newUser })
+      res.status(201).json({ success:true,data:newUser })
 
     } catch (e) {
       const error = e as Error
@@ -60,7 +66,7 @@ class AuthController {
       }
       //permiso especial -> sesion de uso    
 
-      const token = jwt.sign({ id: user._id },SECRET_KEY,{ expiresIn: "1h" });
+      const token = jwt.sign({ id: user._id , email:user.email},SECRET_KEY,{ expiresIn: "1h" });
       res.json({success:true, data:token})
 
     } catch (e) {

@@ -19,7 +19,7 @@ class PedidosController {
         if (fechaDesde) filter.fechaProgramada.$gte = fechaDesde
         if (fechaHasta) filter.fechaProgramada.$lte = fechaHasta
       }
-
+ 
       
       const pedidosBuscado = await MPedido.find(filter)
       res.status(200).json({success: true, data: pedidosBuscado })
