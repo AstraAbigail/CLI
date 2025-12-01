@@ -19,6 +19,16 @@ class PedidosController {
         if (fechaDesde) filter.fechaProgramada.$gte = fechaDesde
         if (fechaHasta) filter.fechaProgramada.$lte = fechaHasta
       }
+
+
+
+      if (estado) {
+        if (Array.isArray(estado)) {
+          filter.estado = { $in: estado }
+        } else {
+          filter.estado = estado
+        }
+      }
  
       
       const pedidosBuscado = await MPedido.find(filter)
