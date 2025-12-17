@@ -18,7 +18,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   try {
     //verificar token si es asi, se decodifica
     const payload = jwt.verify(token, SECRET_KEY);
-     
+    console.log(req,"req del auth mider") 
     req.user = payload as IUserTokenPayload
     
     next()
